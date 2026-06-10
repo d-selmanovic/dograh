@@ -1,13 +1,17 @@
 "use client";
 
-import { Loader2, Phone, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { RealtimeFeedback } from "@/components/workflow/conversation";
 
-import { ApiKeyErrorDialog, ConnectionStatus, WorkflowConfigErrorDialog } from "../../run/[runId]/components";
+import {
+    ApiKeyErrorDialog,
+    AudioControls,
+    ConnectionStatus,
+    WorkflowConfigErrorDialog,
+} from "../../run/[runId]/components";
 import { useWebSocketRTC } from "../../run/[runId]/hooks";
 import type { WorkflowRuntimeNodeTransition } from "./types";
 
@@ -31,6 +35,9 @@ export function EmbeddedVoiceTester({
     const router = useRouter();
     const {
         audioRef,
+        audioInputs,
+        selectedAudioInput,
+        setSelectedAudioInput,
         connectionActive,
         permissionError,
         isCompleted,
@@ -45,6 +52,7 @@ export function EmbeddedVoiceTester({
         start,
         stop,
         isStarting,
+        getAudioInputDevices,
         feedbackMessages,
     } = useWebSocketRTC({
         workflowId,
@@ -53,90 +61,43 @@ export function EmbeddedVoiceTester({
         initialContextVariables,
         onNodeTransition,
     });
-    const autoStartedRef = useRef(false);
-
-    useEffect(() => {
-        if (autoStartedRef.current) {
-            return;
-        }
-        autoStartedRef.current = true;
-        void start();
-    }, [start]);
-
-    const endButtonLabel = connectionActive
-        ? "End Call"
-        : isCompleted
-            ? "Start Another Test"
-            : connectionStatus === "failed"
-                ? "Retry Call"
-                : "Starting Test...";
-
-    const handleFooterAction = async () => {
-        if (connectionActive) {
-            stop();
-            return;
-        }
-        if (isCompleted) {
-            onReset();
-            return;
-        }
-        if (connectionStatus === "failed") {
-            await start();
-        }
-    };
 
     return (
         <>
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border/70 bg-background">
-                <div className="min-h-0 flex-1 overflow-hidden bg-muted/15">
+            <div className="flex h-full min-h-0 flex-col gap-3">
+                <div className="shrink-0 space-y-3">
+                    {isCompleted ? (
+                        <div className="flex items-center justify-center">
+                            <Button onClick={onReset} size="lg">
+                                <RefreshCw className="h-4 w-4" />
+                                Start Another Test
+                            </Button>
+                        </div>
+                    ) : (
+                        <AudioControls
+                            audioInputs={audioInputs}
+                            selectedAudioInput={selectedAudioInput}
+                            setSelectedAudioInput={setSelectedAudioInput}
+                            isCompleted={isCompleted}
+                            connectionActive={connectionActive}
+                            permissionError={permissionError}
+                            start={start}
+                            stop={stop}
+                            isStarting={isStarting}
+                            getAudioInputDevices={getAudioInputDevices}
+                        />
+                    )}
+
+                    <ConnectionStatus connectionStatus={connectionStatus} />
+                </div>
+
+                <div className="min-h-0 flex-1">
                     <RealtimeFeedback
                         mode="live"
                         messages={feedbackMessages}
                         isCallActive={connectionActive}
                         isCallCompleted={isCompleted}
                     />
-                </div>
-
-                <div className="border-t border-border/70 bg-background px-4 py-3">
-                    <div className="flex flex-col gap-3">
-                        <ConnectionStatus connectionStatus={connectionStatus} />
-                        {permissionError ? (
-                            <p className="text-center text-sm text-destructive">{permissionError}</p>
-                        ) : null}
-                        <Button
-                            onClick={handleFooterAction}
-                            disabled={isStarting && connectionStatus !== "failed"}
-                            variant={connectionActive ? "destructive" : "default"}
-                            className="w-full"
-                        >
-                            {isStarting && connectionStatus !== "failed" ? (
-                                <>
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                    Starting Test...
-                                </>
-                            ) : connectionActive ? (
-                                <>
-                                    <Phone className="h-4 w-4" />
-                                    {endButtonLabel}
-                                </>
-                            ) : connectionStatus === "failed" ? (
-                                <>
-                                    <RefreshCw className="h-4 w-4" />
-                                    {endButtonLabel}
-                                </>
-                            ) : isCompleted ? (
-                                <>
-                                    <RefreshCw className="h-4 w-4" />
-                                    {endButtonLabel}
-                                </>
-                            ) : (
-                                <>
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                    {endButtonLabel}
-                                </>
-                            )}
-                        </Button>
-                    </div>
                 </div>
 
                 <audio ref={audioRef} autoPlay playsInline className="hidden" />
@@ -160,3 +121,5 @@ export function EmbeddedVoiceTester({
         </>
     );
 }
+
+export default EmbeddedVoiceTester;

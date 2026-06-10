@@ -47,6 +47,8 @@ AZURE_SPEECH_REGIONS = [
 ]
 
 AZURE_SPEECH_TTS_LANGUAGES = [
+    "bs-BA",
+    "de-DE",
     "en-US",
     "en-GB",
     "en-AU",
@@ -56,24 +58,26 @@ AZURE_SPEECH_TTS_LANGUAGES = [
     "es-MX",
     "fr-FR",
     "fr-CA",
-    "de-DE",
     "it-IT",
     "ja-JP",
     "ko-KR",
-    "zh-CN",
-    "zh-HK",
-    "zh-TW",
+    "nl-NL",
+    "pl-PL",
     "pt-BR",
     "pt-PT",
     "ru-RU",
-    "ar-SA",
-    "nl-NL",
-    "pl-PL",
+    "sr-RS",
     "sv-SE",
+    "ar-SA",
     "hi-IN",
+    "zh-CN",
+    "zh-HK",
+    "zh-TW",
 ]
 
 AZURE_SPEECH_TTS_VOICES = [
+    "bs-BA-VesnaNeural",
+    "de-DE-Seraphina:DragonHDLatestNeural",
     "en-US-AriaNeural",
     "en-US-GuyNeural",
     "en-US-JennyNeural",
@@ -93,9 +97,13 @@ AZURE_SPEECH_TTS_VOICES = [
     "en-US-SaraNeural",
     "en-US-SteffanNeural",
     "en-US-TonyNeural",
+    "sr-RS-NicholasNeural",
+    "sr-RS-SophieNeural",
 ]
 
 AZURE_SPEECH_STT_LANGUAGES = [
+    "bs-BA",
+    "de-DE",
     "en-US",
     "en-GB",
     "en-AU",
@@ -105,18 +113,18 @@ AZURE_SPEECH_STT_LANGUAGES = [
     "es-MX",
     "fr-FR",
     "fr-CA",
-    "de-DE",
     "it-IT",
     "ja-JP",
     "ko-KR",
-    "zh-CN",
+    "nl-NL",
+    "pl-PL",
     "pt-BR",
     "pt-PT",
     "ru-RU",
+    "sr-RS",
     "ar-SA",
-    "nl-NL",
-    "pl-PL",
     "hi-IN",
+    "zh-CN",
 ]
 
 AZURE_EMBEDDING_MODELS = [

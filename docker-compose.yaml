@@ -47,8 +47,8 @@ services:
     container_name: minio
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_USER: "${MINIO_ACCESS_KEY:-minioadmin}"
+      MINIO_ROOT_PASSWORD: "${MINIO_SECRET_KEY:-minioadmin}"
       MINIO_API_CORS_ALLOW_ORIGIN: "*"
     ports:
       - "127.0.0.1:9000:9000" # Bind to localhost explicitly
@@ -154,8 +154,8 @@ services:
       # deployments behind HTTPS, set MINIO_PUBLIC_ENDPOINT in .env to
       # e.g. https://your-server.example.com (nginx proxies /voice-audio/).
       MINIO_PUBLIC_ENDPOINT: "${MINIO_PUBLIC_ENDPOINT:-http://localhost:9000}"
-      MINIO_ACCESS_KEY: "minioadmin"
-      MINIO_SECRET_KEY: "minioadmin"
+      MINIO_ACCESS_KEY: "${MINIO_ACCESS_KEY:-minioadmin}"
+      MINIO_SECRET_KEY: "${MINIO_SECRET_KEY:-minioadmin}"
       MINIO_BUCKET: "voice-audio"
       MINIO_SECURE: "false"
 
@@ -166,10 +166,10 @@ services:
 
       # Langfuse — credentials can be set here or per-organization via the UI
       # at /settings. Tracing is automatically active when credentials are
-      # available; uncomment to set defaults for all organizations.
-      # LANGFUSE_SECRET_KEY: ""
-      # LANGFUSE_PUBLIC_KEY: ""
-      # LANGFUSE_HOST: ""
+      # available; set defaults here for all organizations.
+      LANGFUSE_SECRET_KEY: "${LANGFUSE_SECRET_KEY:-}"
+      LANGFUSE_PUBLIC_KEY: "${LANGFUSE_PUBLIC_KEY:-}"
+      LANGFUSE_HOST: "${LANGFUSE_HOST:-}"
 
       # TURN server configuration (for WebRTC NAT traversal in remote server)
       # Uses time-limited credentials via TURN REST API (HMAC-SHA1)
@@ -180,7 +180,7 @@ services:
       OSS_JWT_SECRET: "${OSS_JWT_SECRET:?OSS_JWT_SECRET must be set to a strong secret}"
 
       # Telemetry
-      ENABLE_TELEMETRY: "${ENABLE_TELEMETRY:-true}"
+      ENABLE_TELEMETRY: "${ENABLE_TELEMETRY:-false}"
       POSTHOG_API_KEY: "phc_ItizB1dP6yv7ZYobbcqrpxTdbomDA8hJFSEmAMdYvIr"
       POSTHOG_HOST: "https://us.i.posthog.com"
 
@@ -215,7 +215,7 @@ services:
       BACKEND_URL: "${BACKEND_URL:-http://api:8000}"
       NODE_ENV: "oss"
       # Flag to enable/ disable posthog
-      ENABLE_TELEMETRY: "${ENABLE_TELEMETRY:-true}"
+      ENABLE_TELEMETRY: "${ENABLE_TELEMETRY:-false}"
 
       # Posthog
       POSTHOG_KEY: "phc_ItizB1dP6yv7ZYobbcqrpxTdbomDA8hJFSEmAMdYvIr"
@@ -229,7 +229,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget --no-verbose --tries=1 --spider http://localhost:3010 || exit 1",
+          "wget --no-verbose --tries=1 --spider http://$$HOSTNAME:3010 || exit 1",
         ]
       interval: 30s
       timeout: 10s

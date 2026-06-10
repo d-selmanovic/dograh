@@ -252,6 +252,8 @@ echo -e "${GREEN}✓ SSL certificates generated${NC}"
 echo -e "${BLUE}[4/$TOTAL] Creating environment file...${NC}"
 OSS_JWT_SECRET=$(openssl rand -hex 32)
 POSTGRES_PASSWORD=$(openssl rand -hex 32)
+MINIO_ACCESS_KEY=$(openssl rand -hex 16)
+MINIO_SECRET_KEY=$(openssl rand -hex 32)
 
 cat > .env << ENV_EOF
 # Remote deployments run with production signaling and HTTPS defaults
@@ -281,6 +283,11 @@ OSS_JWT_SECRET=$OSS_JWT_SECRET
 # API's DATABASE_URL. Do not change after the first start — the password is
 # baked into the postgres data volume when it is first created.
 POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY
+MINIO_SECRET_KEY=$MINIO_SECRET_KEY
+LANGFUSE_HOST=${LANGFUSE_HOST:-}
+LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY:-}
+LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY:-}
 
 # Telemetry (set to false to disable)
 ENABLE_TELEMETRY=$ENABLE_TELEMETRY

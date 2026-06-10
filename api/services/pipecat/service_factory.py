@@ -91,7 +91,18 @@ def create_stt_service(
     )
     if user_config.stt.provider == ServiceProviders.DEEPGRAM.value:
         # Check if using Flux model (English-only, no language selection)
-        if user_config.stt.model == "flux-general-en":
+        if user_config.stt.model in {"flux-general-en", "flux-general-multi"}:
+            language_hints: list[Language] = []
+            if user_config.stt.model == "flux-general-multi":
+                language = getattr(user_config.stt, "language", None)
+                if language and language != "multi":
+                    try:
+                        language_hints = [Language(language)]
+                    except ValueError:
+                        logger.warning(
+                            "Ignoring unsupported Deepgram Flux language hint: {}",
+                            language,
+                        )
             return DeepgramFluxSTTService(
                 api_key=user_config.stt.api_key,
                 settings=DeepgramFluxSTTSettings(
@@ -100,6 +111,7 @@ def create_stt_service(
                     eot_threshold=0.7,
                     eager_eot_threshold=0.5,
                     keyterm=keyterms or [],
+                    language_hints=language_hints,
                 ),
                 should_interrupt=False,  # Let UserAggregator take care of sending InterruptionFrame
                 sample_rate=audio_config.transport_in_sample_rate,
